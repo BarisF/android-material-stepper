@@ -117,14 +117,18 @@ public class StepperLayout extends LinearLayout implements TabsContainer.TabItem
     public final class OnNextClickedCallback {
 
         @UiThread
-        public final void goToNextStep() {
+        public final void goToNextStep(int customPosition) {
             final int totalStepCount = mStepAdapter.getCount();
 
             if (mCurrentStepPosition >= totalStepCount - 1) {
                 return;
             }
 
-            mCurrentStepPosition++;
+            if (customPosition == -1) {
+                mCurrentStepPosition++;
+            } else {
+                mCurrentStepPosition = customPosition;
+            }
             onUpdate(mCurrentStepPosition, true);
         }
 
@@ -133,14 +137,19 @@ public class StepperLayout extends LinearLayout implements TabsContainer.TabItem
     public final class OnBackClickedCallback {
 
         @UiThread
-        public final void goToPrevStep() {
+        public final void goToPrevStep(int customPosition) {
             if (mCurrentStepPosition <= 0) {
                 if (mShowBackButtonOnFirstStep) {
                     mListener.onReturn();
                 }
                 return;
             }
-            mCurrentStepPosition--;
+
+            if (customPosition == -1) {
+                mCurrentStepPosition--;
+            } else {
+                mCurrentStepPosition = customPosition;
+            }
             onUpdate(mCurrentStepPosition, true);
         }
 
@@ -485,7 +494,7 @@ public class StepperLayout extends LinearLayout implements TabsContainer.TabItem
         if (step instanceof BlockingStep) {
             ((BlockingStep) step).onBackClicked(onBackClickedCallback);
         } else {
-            onBackClickedCallback.goToPrevStep();
+            onBackClickedCallback.goToPrevStep(-1);
         }
     }
 
@@ -500,7 +509,7 @@ public class StepperLayout extends LinearLayout implements TabsContainer.TabItem
         if (step instanceof BlockingStep) {
             ((BlockingStep) step).onNextClicked(onNextClickedCallback);
         } else {
-            onNextClickedCallback.goToNextStep();
+            onNextClickedCallback.goToNextStep(-1);
         }
     }
 
